@@ -1,97 +1,78 @@
 import React, { Component } from "react";
-import "./App.css";
-
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      bookmarks: [
-        {
-          tag: "food",
-          link: "https://www.grubhub.com/restaurant/waffle-house-326-w-butler-rd-mauldin/2129684",
-          active: false,
-        }, {
-          tag: "wiki",
-          link: "https://en.wikipedia.org/wiki/Ramona_(1928_film)",
-          active: false,
-        }, {
-          tag: "food",
-          link: "https://www.foodlion.com/",
-          active: false,
-        }, {
-          tag: "todo",
-          link: "https://www.microsoft.com/en-us/microsoft-365/microsoft-to-do-list-app",
-          active: false,
-        }, {
-          tag: "wiki",
-          link: "https://en.wikipedia.org/wiki/D._W._Griffith",
-          active: false,
-        }
-      ]
-    }
-  };
-
-  toggle(index) {
-    let bookmarks = [...this.state.bookmarks]
-    console.log(index)
-    let bookmark = {...bookmarks[index]};
-    bookmark.active = !bookmark.active;
-    // bookmarks[index] = bookmark;
-    this.setState({ bookmarks })
-    // let current = this.state.bookmarks[index]
-    // this.setState({this.current:true})
-    // console.log(this.state.bookmarks[index])
-  }
-
-  render() {
-    return (
-      <React.Fragment>
-        <BookmarkList bookmarks={this.state.bookmarks} toggle={this.toggle} />
-      </React.Fragment>
-    )
-  }
-}
 
 class BookmarkList extends Component {
-  render() {
-    // console.log(this.state)
-    // bookmarks = []
-    // for index in len(this.props.bookmarks):
-    //   bookmark = this.props.bookmarks[index]
-    //   myhtml = f"<div key={index} { bookmark.active  } "
-    //   bookmarks.append(my_html)
 
-    //get a list of all the tags
-    let tags = this.props.bookmarks.map(bookmark => bookmark.tag);
-    //make the tags list unique
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      bookmarks: [],
+      filter: null
+    };
+
+    this.toggle = this.toggle.bind(this);
+  };
+
+  componentDidMount() {
+    const bookmarks = [
+      {
+        tag: "food",
+        link: "https://www.grubhub.com/restaurant/waffle-house-326-w-butler-rd-mauldin/2129684",
+      }, {
+        tag: "wiki",
+        link: "https://en.wikipedia.org/wiki/Ramona_(1928_film)",
+      }, {
+        tag: "food",
+        link: "https://www.foodlion.com/",
+      }, {
+        tag: "todo",
+        link: "https://www.microsoft.com/en-us/microsoft-365/microsoft-to-do-list-app",
+      }, {
+        tag: "wiki",
+        link: "https://en.wikipedia.org/wiki/D._W._Griffith",
+      }
+    ];
+
+    this.setState({ bookmarks });
+  }
+
+  toggle(tag) {
+    // set the filter on state to the tag that was clicked
+    // if no tag is passed to the method, then clear the filter by setting the value to null
+    tag ? this.setState({filter: tag}) : this.setState({filter: null});
+  }
+
+  render() {
+
+    // get a list of all the tags
+    let tags = this.state.bookmarks.map(bookmark => bookmark.tag);
+    // make the tags list unique
     tags = [...new Set(tags)]
-    console.log(tags)
-    //display all the tags
+    // generator tags HTML
     const tagsHTML = tags.map((tag, index) => (
       <div key={index}>
-        <h1 onClick={() => this.props.toggle(index)}>{tag}</h1>
+        <h2 onClick={() => this.toggle(tag)}>{tag}</h2>
       </div>
-    ))
+    ));
 
-    //if someone clicks on a tag, show only links associated with that tag
-    //
 
-    const filteredBookmarks = this.props.bookmarks.filter(bookmark => bookmark.tag === "food")
-    console.log(filteredBookmarks)
-
-    // {
-    //   bookmark.active
-    //   ?
-    //   <div><p>{bookmark.link}</p></div>
-    //   :
-    //   null
-    // }
+    let bookmarks = this.state.bookmarks
+      .filter(bookmark => this.state.filter ? bookmark.tag === this.state.filter : bookmark)
+      .map(bookmark => (
+        <div>
+          <a href={bookmark.link}>{bookmark.link}</a>
+        </div>
+      ));
 
     return (
-      <article><h1>===YOUR BOOKMARKS===</h1>{ tagsHTML }</article>
+      <main>
+        <h1>===YOUR BOOKMARKS===</h1>
+        <h2 onClick={() => this.toggle()}>All</h2>
+        { tagsHTML }
+        { bookmarks }
+      </main>
     )
   }
 }
 
-export default App;
+export default BookmarkList;
